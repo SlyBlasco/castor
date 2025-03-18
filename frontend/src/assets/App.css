@@ -16,6 +16,14 @@
   width: 150px;
   height: 100px;
   border: 2px solid black;
+  overflow: hidden;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  cursor: pointer;
+}
+
+.option:hover {
+  transform: scale(1.1); /* Agranda el elemento al 110% */
+  filter: blur(0); /* Elimina el desenfoque al pasar el mouse */
 }
 
 .option > img {
@@ -23,6 +31,7 @@
   height: 100%;
   object-fit: cover;
   filter: blur(1px);
+  transition: filter 0.3s ease;
 }
 
 .option > p {
@@ -32,6 +41,7 @@
   transform: translate(-50%, -50%);
   font-size: 20px;
   color: white;
+  z-index: 1;
 }
 
 .area-section {
