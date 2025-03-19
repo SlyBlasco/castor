@@ -1,77 +1,92 @@
-import React from "react";
-import "./assets/App.css"; // Importa los estilos
+import { useState, useEffect } from "react";
+import "./assets/App.css"; 
 
 export default function App() {
+  const [costos, setCostos] = useState([]);
+  const [factores, setFactores] = useState([]);
+  const [tipoSeleccionado, setTipoSeleccionado] = useState(null);
+  const [metros, setMetros] = useState("");
+  const [factorSeleccionado, setFactorSeleccionado] = useState(1);
+  const [costoTotal, setCostoTotal] = useState(0);
+
+  // Obtener costos de construcción
+  useEffect(() => {
+    fetch("http://localhost:5000/api/costos")
+      .then((response) => response.json())
+      .then((data) => setCostos(data));
+  }, []);
+
+  // Obtener factores interciudad
+  useEffect(() => {
+    fetch("http://localhost:5000/api/factores")
+      .then((response) => response.json())
+      .then((data) => setFactores(data));
+  }, []);
+
+  // Calcular costo total
+  const calcularCosto = () => {
+    if (tipoSeleccionado !== null && metros > 0) {
+      const costoM2 = costos.find((c) => c.id_tipo === tipoSeleccionado)?.costo || 0;
+      setCostoTotal(costoM2 * metros * factorSeleccionado);
+    }
+  };
+
   return (
     <>
       <div className="navbar">
-        <div className="logo"><img src="../public/LOGO-PNG-COMPLETO-METALIZADO.png"></img></div>
+        <div className="logo">
+          <img src="/LOGO-PNG-COMPLETO-METALIZADO.png" alt="Logo" />
+        </div>
         <div className="menu">
           <a href="#">Cotización básica</a>
           <a href="#">Cotizaciones Anteriores</a>
         </div>
-        <div className="user"><img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png"></img></div>
+        <div className="user">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="User" />
+        </div>
       </div>
-      
+
       <div className="container">
         <h1>Cotización Básica</h1>
         <h2>Tipo de Construcción</h2>
+
         <div className="options">
-          <div className="option">
-            <img src="https://definicion.de/wp-content/uploads/2010/10/residencia-1.jpg"></img>
-            <p>Residencia</p>
-          </div>
-          <div className="option">
-            <img src="https://lirp.cdn-website.com/78ac76fe/dms3rep/multi/opt/970-640w.jpg"></img>
-            <p>Naves industriales</p>
-          </div>
-          <div className="option">
-            <img src="https://i0.wp.com/foodandpleasure.com/wp-content/uploads/2020/10/65345792-h1-facb_angular_pool_view_300dpi.jpg?fit=2800%2C1867&ssl=1"></img>
-            <p>Hoteles</p>
-          </div>
-          <div className="option">
-            <img src="https://blogposgrados.tijuana.ibero.mx/wp-content/uploads/2022/06/viviendanueva180918.jpeg"></img>
-            <p>Casa interés social</p>
-          </div>
-          <div className="option">
-            <img src="https://locurainmobiliaria.com/wp-content/uploads/2024/09/condominios.jpg"></img>
-            <p>Condominios</p>
-          </div>
-          <div className="option">
-            <img src="https://s7d1.scene7.com/is/image/mcdonalds/crown_point_mcdonalds-RR-EDIT_001:hero-desktop?resmode=sharp2"></img>
-            <p>Comercio</p>
-          </div>
-        </div>
-        
-        <div className="area-section">
-          <label>Ingresa el área total en m²: </label>
-          <input type="text" placeholder="Ingrese metros cuadrados" />
-        </div>
-        
-        <div className="ciudad-section">
-          <label>Seleccione factor interciudad: </label>
-          <select name="ciudades" id="ciudades">
-            <option value="hermosillo">Hermosillo</option>
-            <option value="nogales">Nogales</option>
-            <option value="ciudad_obregon">Ciudad Obregon</option>
-            <option value="guaymas">Guaymas</option>
-            <option value="san_luis">San Luis Río Colorado</option>
-            <option value="navojoa">Navojoa</option>
-            <option value="agua_prieta">Agua Prieta</option>
-            <option value="empalme">Empalme</option>
-            <option value="mazatlan">Mazatlan</option>
-            <option value="culiacan">Culiacan</option>
-            <option value="cdmx">Ciudad de México</option>
-            <option value="monterrey">Monterrey</option>
-            <option value="guadalajara">Guadalajara</option>
-            <option value="puebla">Puebla</option>
-            <option value="toluca">Toluca</option>
-          </select>
-          <button>Calcular</button>
+          {costos.map((c) => (
+            <div
+              key={c.id_tipo}
+              className={`option ${tipoSeleccionado === c.id_tipo ? "selected" : ""}`}
+              onClick={() => setTipoSeleccionado(c.id_tipo)}
+            >
+              <img src={`/assets/tipo${c.id_tipo}.jpg`} alt={`Tipo ${c.id_tipo}`} />
+              <p>Tipo {c.id_tipo}</p>
+            </div>
+          ))}
         </div>
 
-        <h3>Costo total estimado:</h3>
-        
+        <div className="area-section">
+          <label>Ingresa el área total en m²: </label>
+          <input
+            type="number"
+            value={metros}
+            onChange={(e) => setMetros(Number(e.target.value))}
+            placeholder="Ingrese metros cuadrados"
+          />
+        </div>
+
+        <div className="ciudad-section">
+          <label>Seleccione factor interciudad: </label>
+          <select onChange={(e) => setFactorSeleccionado(Number(e.target.value))}>
+            {factores.map((f) => (
+              <option key={f.id_factor} value={f.factor}>
+                {f.ciudad} (x{f.factor})
+              </option>
+            ))}
+          </select>
+          <button onClick={calcularCosto}>Calcular</button>
+        </div>
+
+        <h3>Costo total estimado: ${costoTotal.toFixed(2)}</h3>
+
         <div className="buttons">
           <button>Guardar</button>
           <button>Compartir</button>
