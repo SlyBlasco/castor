@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { Tooltip } from "react-tooltip";
+import { jsPDF } from "jspdf";
 import "react-tooltip/dist/react-tooltip.css";
 import "../assets/Cotizacion.css"; 
 
 export default function Cotizacion() {
   const [costos, setCostos] = useState([]);
   const [factores, setFactores] = useState([]);
+  const [usuario, setUsuario] = useState(null);
   const [tipoSeleccionado, setTipoSeleccionado] = useState(null);
   const [metros, setMetros] = useState("");
   const [factorSeleccionado, setFactorSeleccionado] = useState(1);
@@ -25,12 +27,43 @@ export default function Cotizacion() {
       .then((data) => setFactores(data));
   }, []);
 
+  // Obtener usuarios
+  useEffect(() => {
+    fetch("http://localhost:5000/api/usuarios")
+      .then((response) => response.json())
+      .then((data) => setUsuario(data));
+  }, []);
+
   // Calcular costo total
   const calcularCosto = () => {
     if (tipoSeleccionado !== null && metros > 0) {
       const costoM2 = costos.find((c) => c.id_tipo === tipoSeleccionado)?.costo || 0;
       setCostoTotal(costoM2 * metros * factorSeleccionado);
     }
+  };
+
+  const generarReporte = () => {
+    if (!tipoSeleccionado || metros <= 0) {
+      alert("Por favor, complete todos los datos antes de generar el reporte.");
+      return;
+    }
+  
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+  
+    const tipo = costos.find((c) => c.id_tipo === tipoSeleccionado);
+    const descripcion = tipo ? tipo.descripcion : "No disponible";
+    const user = usuario.find((u) => u.nombre);
+  
+    doc.text(`Reporte de Cotización ${user.nombre}`, 10, 10);
+    doc.setFontSize(12);
+    doc.text(`Tipo de Construcción: ${tipo.id_tipo}`, 10, 30);
+    doc.text(`Descripción: ${descripcion}`, 10, 40);
+    doc.text(`Área Total: ${metros} m²`, 10, 50);
+    doc.text(`Factor Interciudad: ${factorSeleccionado}`, 10, 60);
+    doc.text(`Costo Total Estimado: $${costoTotal.toFixed(2)}`, 10, 70);
+  
+    doc.save("reporte_cotizacion.pdf");
   };
 
   return (
@@ -99,6 +132,7 @@ export default function Cotizacion() {
         <div className="buttons">
           <button>Guardar</button>
           <button>Compartir</button>
+          <button onClick={generarReporte}>Generar Reporte</button>
         </div>
       </div>
     </>

@@ -89,5 +89,15 @@ def obtener_factores():
     conn.close()
     return jsonify(factores)
 
+# Ruta para obtener los usuarios
+@app.route('/api/usuarios', methods=['GET'])
+def obtener_usuarios():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT id_usuario, nombre, correo FROM usuarios")
+    factores = cursor.fetchall()
+    conn.close()
+    return jsonify(factores)
+
 if __name__ == '__main__':
     app.run(debug=True)
