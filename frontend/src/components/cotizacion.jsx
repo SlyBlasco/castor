@@ -7,7 +7,7 @@ import "../assets/Cotizacion.css";
 export default function Cotizacion() {
   const [costos, setCostos] = useState([]);
   const [factores, setFactores] = useState([]);
-  const [usuario, setUsuario] = useState(null);
+  const usuario = localStorage.getItem("usuario") || "Invitado";
   const [tipoSeleccionado, setTipoSeleccionado] = useState(null);
   const [metros, setMetros] = useState("");
   const [factorSeleccionado, setFactorSeleccionado] = useState(1);
@@ -42,29 +42,75 @@ export default function Cotizacion() {
     }
   };
 
+
   const generarReporte = () => {
     if (!tipoSeleccionado || metros <= 0) {
       alert("Por favor, complete todos los datos antes de generar el reporte.");
       return;
     }
-  
-    const doc = new jsPDF();
-    doc.setFontSize(16);
-  
+    
+    // Recuperar el nombre del usuario del localStorage
+    const usuario = localStorage.getItem("usuario") || "Invitado";
     const tipo = costos.find((c) => c.id_tipo === tipoSeleccionado);
     const descripcion = tipo ? tipo.descripcion : "No disponible";
-    const user = usuario.find((u) => u.nombre);
-  
-    doc.text(`Reporte de Cotización ${user.nombre}`, 10, 10);
+
+    const doc = new jsPDF();
+
+    // CONFIGURACIÓN DEL REPORTE
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    // Título (centrado con acento naranja)
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.setTextColor(242, 160, 7); // Color #F2A007
+    const titulo = `Reporte de Cotización - ${usuario}`;
+    doc.text(titulo, pageWidth / 2, 20, { align: "center" });
+
+    // Línea divisoria debajo del título
+    doc.setDrawColor(242, 160, 7);
+    doc.setLineWidth(0.5);
+    doc.line(10, 25, pageWidth - 10, 25);
+
+    // Contenido
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
-    doc.text(`Tipo de Construcción: ${tipo.id_tipo}`, 10, 30);
-    doc.text(`Descripción: ${descripcion}`, 10, 40);
-    doc.text(`Área Total: ${metros} m²`, 10, 50);
-    doc.text(`Factor Interciudad: ${factorSeleccionado}`, 10, 60);
-    doc.text(`Costo Total Estimado: $${costoTotal.toFixed(2)}`, 10, 70);
-  
-    doc.save("reporte_cotizacion.pdf");
+    doc.setTextColor(51, 51, 51); // Gris oscuro (#333)
+
+    let y = 35; // posición vertical inicial
+
+    // Tipo de construcción
+    doc.text(`Tipo de Construcción: ${tipo.id_tipo}`, 10, y);
+    y += 10;
+
+    // Descripción: envolvemos el texto para que no se corte
+    const maxLineWidth = pageWidth - 20; // márgenes de 10 en ambos lados
+    const descripcionTexto = `Descripción: ${descripcion}`;
+    const descripcionEnvoltorio = doc.splitTextToSize(descripcionTexto, maxLineWidth);
+    doc.text(descripcionEnvoltorio, 10, y);
+    y += descripcionEnvoltorio.length * 7; // se incrementa según el número de líneas (ajusta 7 si es necesario)
+    
+    y += 5; // espacio adicional
+
+    // Área Total
+    doc.text(`Área Total: ${metros} m²`, 10, y);
+    y += 10;
+
+    // Factor Interciudad
+    doc.text(`Factor Interciudad: ${factorSeleccionado}`, 10, y);
+    y += 10;
+
+    // Costo Total Estimado
+    doc.text(`Costo Total Estimado: $${costoTotal.toFixed(2)}`, 10, y);
+    y += 10;
+
+    // Opción: agregar línea divisoria final
+    doc.setDrawColor(224, 224, 224); // Gris claro
+    doc.line(10, y, pageWidth - 10, y);
+
+    // Guardar el archivo con el nombre que incluye el usuario
+    doc.save(`reporte_cotizacion_${usuario}.pdf`);
   };
+
 
   return (
     <>

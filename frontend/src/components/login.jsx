@@ -1,21 +1,28 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login({ onLogin }) {
   const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     fetch('http://localhost:5000/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ correo, contrasena })
+      body: JSON.stringify({ correo, contrasena }),
     })
       .then((res) => res.json().then(data => ({ status: res.status, data })))
       .then(({ status, data }) => {
         if (status === 200) {
-          onLogin(data.usuario);  // Guarda los datos del usuario
+          // Guarda el nombre del usuario en localStorage
+          localStorage.setItem("usuario", data.usuario.nombre);
+          // Puedes también llamar a onLogin para actualizar el estado global si lo usas
+          onLogin(data.usuario);
+          // Redirige al componente principal (p.ej., Cotizacion)
+          navigate('/');
         } else {
           setError(data.error || 'Error en el inicio de sesión');
         }

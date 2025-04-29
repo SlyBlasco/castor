@@ -1,5 +1,6 @@
+/* Auth.css */
 
-/* Estilos para pantallas de autenticación (login, registro) */
+/* Contenedor de autenticación */
 .auth-container {
   max-width: 400px;
   margin: 50px auto;
@@ -9,12 +10,20 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
+/* Títulos y textos */
 .auth-container h2 {
   text-align: center;
   margin-bottom: 20px;
-  color: #333;
+  color: #424242; /* Gris oscuro */
 }
 
+.auth-container p {
+  text-align: center;
+  font-size: 14px;
+  color: #757575; /* Gris medio */
+}
+
+/* Formularios */
 .auth-container form {
   display: flex;
   flex-direction: column;
@@ -23,7 +32,7 @@
 .auth-container label {
   margin-bottom: 5px;
   font-size: 14px;
-  color: #555;
+  color: #424242;
 }
 
 .auth-container input[type="text"],
@@ -31,27 +40,22 @@
 .auth-container input[type="password"] {
   padding: 10px;
   margin-bottom: 15px;
-  border: 1px solid #ccc;
+  border: 1px solid #E0E0E0;
   border-radius: 4px;
 }
 
+/* Botones */
 .auth-container button {
-  padding: 10px 20px;
-  background-color: #007BFF;
+  padding: 10px;
+  background-color: #F2A007;  /* Naranja acento */
   border: none;
   border-radius: 4px;
   color: #fff;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s;
 }
 
 .auth-container button:hover {
-  background-color: #0056b3;
-}
-
-.auth-container p {
-  text-align: center;
-  color: #888;
-  font-size: 14px;
+  background-color: #D18D05;  /* Variación más oscura del acento */
 }
