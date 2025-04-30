@@ -2,8 +2,8 @@ import mysql.connector
 
 def get_db_connection():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="Minecraft1",
-        database="castordb"
+        host="auth-db636.hstgr.io",
+        user="u861134693_castoruser",
+        password="Nalgasdemike8",
+        database="u861134693_castordb"
     )

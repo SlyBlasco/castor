@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Login from './components/login';
-import Register from './components/Register';
+import Register from './components/register';
 import Cotizacion from './components/cotizacion'; // Tu componente original de cotización
 import './assets/App.css';
 import { useState } from 'react';
