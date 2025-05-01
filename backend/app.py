@@ -2,10 +2,18 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import mysql.connector
 import bcrypt
-from config import get_db_connection
+from config import DB_HOST, DB_USER, DB_PASS, DB_NAME
 
 app = Flask(__name__)
 CORS(app)
+
+def get_db_connection():
+    return mysql.connector.connect(
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASS,
+        database=DB_NAME
+    )
 
 # Endpoint de registro
 @app.route('/api/register', methods=['POST'])
