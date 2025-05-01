@@ -15,21 +15,21 @@ export default function Cotizacion() {
 
   // Obtener costos de construcción
   useEffect(() => {
-    fetch("http://localhost:5000/api/costos")
+    fetch(`${import.meta.env.VITE_API_URL}/api/costos`)
       .then((response) => response.json())
       .then((data) => setCostos(data));
   }, []);
 
   // Obtener factores interciudad
   useEffect(() => {
-    fetch("http://localhost:5000/api/factores")
+    fetch(`${import.meta.env.VITE_API_URL}/api/factores`)
       .then((response) => response.json())
       .then((data) => setFactores(data));
   }, []);
 
   // Obtener usuarios
   useEffect(() => {
-    fetch("http://localhost:5000/api/usuarios")
+    fetch(`${import.meta.env.VITE_API_URL}/api/usuarios`)
       .then((response) => response.json())
       .then((data) => setUsuario(data));
   }, []);
