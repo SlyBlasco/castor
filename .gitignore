@@ -22,3 +22,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python virtual env
+/backend/venv/
+__pycache__/
+
+# Node modules y build de frontend
+/frontend/node_modules/
+/frontend/dist/
+
+# Variables de entorno
+.env
+
