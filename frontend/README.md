@@ -15,5 +15,5 @@ If you are developing a production application, we recommend using TypeScript an
 
 1. Clonar repo:
    ```bash
-   git clone https://…/castor.git
+   git clone https://github.com/SlyBlasco/castor.git
    cd castor
