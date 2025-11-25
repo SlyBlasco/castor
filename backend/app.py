@@ -107,5 +107,72 @@ def obtener_usuarios():
     conn.close()
     return jsonify(factores)
 
+# -------------------------------------------------------------------------
+# Ruta para guardar una cotización
+# HU3: GUARDAR COTIZACIÓN
+# Tarea 1: Crear endpoint para guardar cotizaciones
+# -------------------------------------------------------------------------
+@app.route('/api/guardar_cotizacion', methods=['POST'])
+def guardar_cotizacion():
+    data = request.get_json()
+
+    # Extracción de datos del cuerpo de la petición
+    id_usuario = data.get('id_usuario')
+    nombre = data.get('nombre')
+    metros = data.get('metros')
+    tipo = data.get('tipo')
+    factor = data.get('factor')
+    total = data.get('total')
+
+    # --- TAREA 2: VALIDACIÓN DE CAMPOS ---
+    
+    # 1. Validar que todos los campos obligatorios existan
+    if not all([id_usuario, nombre, metros, tipo, factor, total]):
+        return jsonify({'error': 'Todos los campos son obligatorios (id_usuario, nombre, metros, tipo, factor, total)'}), 400
+
+    # 2. Validar tipos de datos y rangos lógicos
+    try:
+        metros_float = float(metros)
+        factor_float = float(factor)
+        total_float = float(total)
+        tipo_int = int(tipo)
+
+        if metros_float <= 0:
+            return jsonify({'error': 'Los metros cuadrados deben ser mayores a 0'}), 400
+        
+        if total_float <= 0:
+            return jsonify({'error': 'El costo total debe ser mayor a 0'}), 400
+
+    except ValueError:
+        return jsonify({'error': 'Error en el formato de los datos numéricos'}), 400
+
+    # 3. Validar longitud del nombre (según base de datos VARCHAR(150))
+    if len(nombre) > 150:
+        return jsonify({'error': 'El nombre de la cotización es demasiado largo (máx 150 caracteres)'}), 400
+
+
+    # --- TAREA 3: INSERTAR EN BASE DE DATOS ---
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        query = """
+            INSERT INTO cotizaciones (id_usuario, nombre, metros, tipo, factor, total)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(query, (id_usuario, nombre, metros_float, tipo_int, factor_float, total_float))
+        conn.commit()
+        
+        return jsonify({'message': 'Cotización guardada correctamente', 'id_cotizacion': cursor.lastrowid}), 201
+
+    except mysql.connector.Error as err:
+        conn.rollback()
+        print(f"Error BD: {err}")
+        return jsonify({'error': 'Error al guardar en la base de datos'}), 500
+        
+    finally:
+        cursor.close()
+        conn.close()
+
 if __name__ == '__main__':
     app.run(debug=False)
