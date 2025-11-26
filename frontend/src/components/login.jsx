@@ -20,6 +20,7 @@ export default function Login({ onLogin }) {
           // Guarda el nombre del usuario en localStorage
           localStorage.setItem("usuario", data.usuario.nombre);
           // Puedes también llamar a onLogin para actualizar el estado global si lo usas
+          localStorage.setItem("usuario", data.usuario.nombre);
           onLogin(data.usuario);
           // Redirige al componente principal (p.ej., Cotizacion)
           navigate('/');

@@ -7,11 +7,14 @@ import "../assets/Cotizacion.css";
 export default function Cotizacion() {
   const [costos, setCostos] = useState([]);
   const [factores, setFactores] = useState([]);
-  const usuario = localStorage.getItem("usuario") || "Invitado";
+  const usuarioData = JSON.parse(localStorage.getItem("usuario_data") || "null");
+  const usuarioNombre = usuarioData ? usuarioData.nombre : "Invitado";
   const [tipoSeleccionado, setTipoSeleccionado] = useState(null);
   const [metros, setMetros] = useState("");
   const [factorSeleccionado, setFactorSeleccionado] = useState(1);
   const [costoTotal, setCostoTotal] = useState(0);
+  // NUEVO ESTADO: Nombre de la cotización (Requisito HU3)
+  const [nombreCotizacion, setNombreCotizacion] = useState("");
 
   // Obtener costos de construcción
   useEffect(() => {
@@ -42,6 +45,51 @@ export default function Cotizacion() {
     }
   };
 
+  // --- NUEVA FUNCIÓN: GUARDAR COTIZACIÓN (HU3 - Tarea 4) ---
+  const guardarCotizacion = async () => {
+    if (!usuarioData || !usuarioData.id_usuario) {
+        alert("Error: No se ha identificado al usuario. Por favor inicie sesión nuevamente.");
+        return;
+    }
+    if (costoTotal <= 0) {
+        alert("Primero debes calcular el costo.");
+        return;
+    }
+    if (!nombreCotizacion.trim()) {
+        alert("Por favor asigna un nombre a tu cotización para identificarla después.");
+        return;
+    }
+
+    const datosGuardar = {
+        id_usuario: usuarioData.id_usuario,
+        nombre: nombreCotizacion,
+        metros: parseFloat(metros),
+        tipo: tipoSeleccionado,
+        factor: factorSeleccionado,
+        total: costoTotal
+    };
+
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/guardar_cotizacion`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datosGuardar)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("¡Cotización guardada exitosamente en tu historial!");
+            setNombreCotizacion("");
+        } else {
+            alert("Error al guardar: " + (data.error || "Desconocido"));
+        }
+    } catch (error) {
+        console.error("Error de red:", error);
+        alert("No se pudo conectar con el servidor.");
+    }
+  };
+
 
   const generarReporte = () => {
     if (!tipoSeleccionado || metros <= 0) {
@@ -63,7 +111,7 @@ export default function Cotizacion() {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
     doc.setTextColor(242, 160, 7); // Color #F2A007
-    const titulo = `Reporte de Cotización - ${usuario}`;
+    const titulo = `Reporte de Cotización - ${usuarioNombre}`;
     doc.text(titulo, pageWidth / 2, 20, { align: "center" });
 
     // Línea divisoria debajo del título
