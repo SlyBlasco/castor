@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function Login({ onLogin }) {
   const [correo, setCorreo] = useState('');
@@ -17,10 +17,7 @@ export default function Login({ onLogin }) {
       .then((res) => res.json().then(data => ({ status: res.status, data })))
       .then(({ status, data }) => {
         if (status === 200) {
-          // Guarda el nombre del usuario en localStorage
-          localStorage.setItem("usuario", data.usuario.nombre);
-          // Puedes también llamar a onLogin para actualizar el estado global si lo usas
-          localStorage.setItem("usuario", data.usuario.nombre);
+          localStorage.setItem("usuario_data", JSON.stringify(data.usuario));
           onLogin(data.usuario);
           // Redirige al componente principal (p.ej., Cotizacion)
           navigate('/');
@@ -50,6 +47,7 @@ export default function Login({ onLogin }) {
         />
         <button type="submit">Entrar</button>
       </form>
+      <p>¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link></p>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 /* Contenedor principal */
 .container {
-  max-width: 1200px;
+  max-width: 1500px;
+  min-height: 700px;
   margin: 30px auto;
   padding: 20px;
   background-color: #fff;
