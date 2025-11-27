@@ -108,6 +108,40 @@ def obtener_usuarios():
     return jsonify(factores)
 
 # -------------------------------------------------------------------------
+# HU1: VISUALIZAR COTIZACIONES PREVIAS
+# Tarea 1: Crear endpoint GET /cotizaciones/:usuario
+# -------------------------------------------------------------------------
+@app.route('/api/cotizaciones/<int:id_usuario>', methods=['GET'])
+def obtener_historial_usuario(id_usuario):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # Hacemos JOIN para traer el nombre del tipo de construcción
+        query = """
+            SELECT 
+                c.id_cotizacion, 
+                c.nombre AS nombre_proyecto, 
+                c.fecha, 
+                c.metros, 
+                c.total, 
+                tc.nombre AS tipo_construccion 
+            FROM cotizaciones c
+            JOIN tiposconstruccion tc ON c.tipo = tc.id_tipo
+            WHERE c.id_usuario = %s
+            ORDER BY c.fecha DESC
+        """
+        cursor.execute(query, (id_usuario,))
+        cotizaciones = cursor.fetchall()
+        return jsonify(cotizaciones), 200
+    except mysql.connector.Error as err:
+        print(f"Error al obtener historial: {err}")
+        return jsonify({'error': str(err)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+        
+# -------------------------------------------------------------------------
 # Ruta para guardar una cotización
 # HU3: GUARDAR COTIZACIÓN
 # Tarea 1: Crear endpoint para guardar cotizaciones
