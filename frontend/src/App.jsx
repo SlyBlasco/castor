@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-ro
 import Login from './components/login';
 import Register from './components/register';
 import Cotizacion from './components/cotizacion';
+import Historial from './components/historial';
 import './assets/App.css';
 import { useState, useEffect } from 'react';
 
@@ -48,6 +49,16 @@ export default function Main() {
                 <h1>Bienvenido a Riva Construcciones</h1>
                 <p>Por favor, <Link to="/login">inicia sesión</Link> o <Link to="/register">regístrate</Link> para continuar.</p>
               </div>
+            )
+          } 
+        />
+        <Route 
+          path="/historial" 
+          element={
+            usuario ? (
+              <Historial usuario={usuario} handleLogout={handleLogout} />
+            ) : (
+              <Navigate to="/login" />
             )
           } 
         />

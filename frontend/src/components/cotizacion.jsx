@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from 'react-router-dom';
 import { Tooltip } from "react-tooltip";
 import { jsPDF } from "jspdf";
 import "react-tooltip/dist/react-tooltip.css";
@@ -139,34 +140,13 @@ export default function Cotizacion({ usuario, handleLogout }) {
           <img src="assets/LOGO-PNG-COMPLETO-METALIZADO.png" alt="Logo" />
         </div>
         <div className="menu">
-          <a href="#">Cotización básica</a>
-          <a href="#">Cotizaciones Anteriores</a>
+          <Link to="/">Cotización básica</Link>
+          <Link to="/historial" style={{fontWeight: 'bold', textDecoration: 'underline'}}>Cotizaciones Anteriores</Link>
         </div>
         <div className="user" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-             <span style={{ fontWeight: 'bold', color: 'white' }}>{usuarioNombre}</span>
-             {/* Botón pequeño para cerrar sesión */}
-             <button 
-                onClick={handleLogout}
-                style={{
-                  background: 'transparent',
-                  border: '1px solid #aaa',
-                  color: '#ccc',
-                  padding: '2px 8px',
-                  fontSize: '10px',
-                  cursor: 'pointer',
-                  borderRadius: '4px',
-                  marginTop: '2px'
-                }}
-             >
-               Cerrar Sesión
-             </button>
-          </div>
-          <img 
-            src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" 
-            alt="User" 
-            style={{ width: '40px', height: '40px', borderRadius: '50%' }}
-          />
+          <span style={{ fontWeight: 'bold', color: 'white' }}>{usuario ? usuario.nombre : "Invitado"}</span>
+             <button onClick={handleLogout} style={{ fontSize: '10px', padding: '2px 5px', cursor: 'pointer' }}>Salir</button>
+             <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="User" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
         </div>
       </div>
 
