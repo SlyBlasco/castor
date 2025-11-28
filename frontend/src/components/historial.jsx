@@ -30,7 +30,17 @@ export default function Historial({ usuario, handleLogout }) {
     // 1. Filtro por nombre (insensible a mayúsculas/minúsculas)
     const coincideNombre = c.nombre_proyecto.toLowerCase().includes(filtroNombre.toLowerCase());
     // 2. Filtro por fecha (si el usuario seleccionó una fecha)
-    const coincideFecha = filtroFecha ? c.fecha.startsWith(filtroFecha) : true;
+    let coincideFecha = true;
+    if (filtroFecha) {
+      try {
+        const fechaObj = new Date(c.fecha);
+        const fechaSoloDia = fechaObj.toISOString().split('T')[0];
+        
+        coincideFecha = fechaSoloDia === filtroFecha;
+      } catch (error) {
+        coincideFecha = false;
+      }
+    }
 
     return coincideNombre && coincideFecha;
   });
