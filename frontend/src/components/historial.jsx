@@ -5,6 +5,10 @@ import "../assets/Cotizacion.css";
 export default function Historial({ usuario, handleLogout }) {
   const [cotizaciones, setCotizaciones] = useState([]);
 
+  // TAREA 4: Estados para los filtros
+  const [filtroNombre, setFiltroNombre] = useState("");
+  const [filtroFecha, setFiltroFecha] = useState("");
+
   // TAREA 2: Integrar con el endpoint y renderizar datos dinámicamente
   useEffect(() => {
     if (usuario && usuario.id_usuario) {
@@ -20,6 +24,16 @@ export default function Historial({ usuario, handleLogout }) {
         .catch(err => console.error("Error al cargar historial:", err));
     }
   }, [usuario]);
+
+  // TAREA 4: Lógica de filtrado
+  const cotizacionesFiltradas = cotizaciones.filter((c) => {
+    // 1. Filtro por nombre (insensible a mayúsculas/minúsculas)
+    const coincideNombre = c.nombre_proyecto.toLowerCase().includes(filtroNombre.toLowerCase());
+    // 2. Filtro por fecha (si el usuario seleccionó una fecha)
+    const coincideFecha = filtroFecha ? c.fecha.startsWith(filtroFecha) : true;
+
+    return coincideNombre && coincideFecha;
+  });
 
   return (
     <>
@@ -40,6 +54,31 @@ export default function Historial({ usuario, handleLogout }) {
 
       <div className="container">
         <h1>Historial de Cotizaciones</h1>
+
+        {/* TAREA 4: UI de Filtros */}
+        <div className="filtros-container" style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginBottom: '20px', flexWrap: 'wrap' }}>
+            <input 
+                type="text" 
+                placeholder="🔍 Buscar por nombre..." 
+                value={filtroNombre}
+                onChange={(e) => setFiltroNombre(e.target.value)}
+                style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', minWidth: '200px' }}
+            />
+            <input 
+                type="date" 
+                value={filtroFecha}
+                onChange={(e) => setFiltroFecha(e.target.value)}
+                style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+            />
+            {(filtroNombre || filtroFecha) && (
+                <button 
+                    onClick={() => {setFiltroNombre(''); setFiltroFecha('');}}
+                    style={{ padding: '8px 15px', backgroundColor: '#e74c3c', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                    Limpiar
+                </button>
+            )}
+        </div>
         
         {/* TAREA 2: Estructura de la Tabla */}
         <div className="tabla-responsive">
@@ -54,24 +93,32 @@ export default function Historial({ usuario, handleLogout }) {
                 </thead>
                 <tbody>
                     {/* TAREA 3: Renderizado dinámico de filas Mostrar nombre, fecha, tipo y total*/}
-                    {cotizaciones.length > 0 ? (
-                        cotizaciones.map((c) => (
+                    {cotizacionesFiltradas.length > 0 ? (
+                        cotizacionesFiltradas.map((c) => (
                             <tr key={c.id_cotizacion} style={{ borderBottom: '1px solid #ddd' }}>
                                 <td style={{ padding: '10px' }}>{new Date(c.fecha).toLocaleDateString()}</td>
-                                <td style={{ padding: '10px' }}>{c.nombre_proyecto}</td>
+                                <td style={{ padding: '10px', fontWeight: 'bold' }}>{c.nombre_proyecto}</td>
                                 <td style={{ padding: '10px' }}>{c.tipo_construccion}</td>
-                                <td style={{ padding: '10px' }}>${c.total.toFixed(2)}</td>
+                                <td style={{ padding: '10px', color: '#F2A007', fontWeight: 'bold' }}>
+                                    ${Number(c.total).toFixed(2)}
+                                </td>
                             </tr>
                         ))
                     ) : (
                         <tr>
-                            <td colSpan="4" style={{ padding: '20px', textAlign: 'center' }}>
-                                No se encontraron cotizaciones previas.
+                            <td colSpan="4" style={{ padding: '30px', textAlign: 'center', color: '#666' }}>
+                                {cotizaciones.length === 0 ? "Aún no tienes cotizaciones guardadas." : "No se encontraron resultados con esos filtros."}
                             </td>
                         </tr>
                     )}
                 </tbody>
             </table>
+        </div>
+
+        <div style={{textAlign: 'center', marginTop: '20px'}}>
+             <Link to="/">
+                <button style={{ backgroundColor: '#424242' }}>Nueva Cotización</button>
+             </Link>
         </div>
       </div>
     </>
