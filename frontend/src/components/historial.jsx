@@ -53,8 +53,23 @@ export default function Historial({ usuario, handleLogout }) {
                     </tr>
                 </thead>
                 <tbody>
-                    {/* Renderizado dinámico de filas */}
-                    {/* FALTANTE TAREA 3 */}
+                    {/* TAREA 3: Renderizado dinámico de filas Mostrar nombre, fecha, tipo y total*/}
+                    {cotizaciones.length > 0 ? (
+                        cotizaciones.map((c) => (
+                            <tr key={c.id_cotizacion} style={{ borderBottom: '1px solid #ddd' }}>
+                                <td style={{ padding: '10px' }}>{new Date(c.fecha).toLocaleDateString()}</td>
+                                <td style={{ padding: '10px' }}>{c.nombre_proyecto}</td>
+                                <td style={{ padding: '10px' }}>{c.tipo_construccion}</td>
+                                <td style={{ padding: '10px' }}>${c.total.toFixed(2)}</td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="4" style={{ padding: '20px', textAlign: 'center' }}>
+                                No se encontraron cotizaciones previas.
+                            </td>
+                        </tr>
+                    )}
                 </tbody>
             </table>
         </div>
