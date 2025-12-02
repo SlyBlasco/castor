@@ -208,5 +208,44 @@ def guardar_cotizacion():
         cursor.close()
         conn.close()
 
+# -------------------------------------------------------------------------
+# HU4: ABRIR COTIZACIÓN PREVIA
+# Tarea 1: Endpoint GET /cotizacion/:id
+# -------------------------------------------------------------------------
+@app.route('/api/cotizacion/<int:id_cotizacion>', methods=['GET'])
+def obtener_detalle_cotizacion(id_cotizacion):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # Recuperamos todos los datos, uniendo con tiposconstruccion para tener el nombre y descripción
+        query = """
+            SELECT 
+                c.id_cotizacion, 
+                c.nombre AS nombre_proyecto, 
+                c.fecha, 
+                c.metros, 
+                c.factor,
+                c.total, 
+                tc.nombre AS tipo_nombre,
+                tc.descripcion AS tipo_descripcion
+            FROM cotizaciones c
+            JOIN tiposconstruccion tc ON c.tipo = tc.id_tipo
+            WHERE c.id_cotizacion = %s
+        """
+        cursor.execute(query, (id_cotizacion,))
+        cotizacion = cursor.fetchone()
+        
+        if cotizacion:
+            return jsonify(cotizacion), 200
+        else:
+            return jsonify({'error': 'Cotización no encontrada'}), 404
+            
+    except mysql.connector.Error as err:
+        return jsonify({'error': str(err)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
 if __name__ == '__main__':
     app.run(debug=False)
