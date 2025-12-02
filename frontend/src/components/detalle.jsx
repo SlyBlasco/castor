@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import "../assets/Cotizacion.css";
+import "../assets/Cotizacion.css"; 
 
+/* TAREA 2 */
 export default function Detalle({ usuario, handleLogout }) {
-  const { id } = useParams(); // Obtiene el ID de la URL
+  const { id } = useParams();
   const [cotizacion, setCotizacion] = useState(null);
   const [error, setError] = useState("");
 
-  // Cargar los datos al abrir la página
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/cotizacion/${id}`)
       .then(res => {
@@ -20,6 +20,10 @@ export default function Detalle({ usuario, handleLogout }) {
 
   if (error) return <div className="container"><p style={{color: 'red'}}>{error}</p><Link to="/historial">Volver</Link></div>;
   if (!cotizacion) return <div className="container"><p>Cargando...</p></div>;
+
+  // TAREA 3: Calcular el Costo Unitario Original
+  // Fórmula: Total / (Metros * Factor)
+  const costoUnitario = cotizacion.total / (cotizacion.metros * cotizacion.factor);
 
   return (
     <>
@@ -41,7 +45,7 @@ export default function Detalle({ usuario, handleLogout }) {
       <div className="container">
         <h1>Detalle de Cotización</h1>
         
-        {/* Tarjeta de Detalle (Read-only) */}
+        {/* Tarjeta de Detalle (Read-only) - TAREA 4 CUMPLIDA (No editable) */}
         <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '20px', maxWidth: '600px', margin: '0 auto', textAlign: 'left', backgroundColor: '#f9f9f9' }}>
             
             <h2 style={{ borderBottom: '2px solid #F2A007', paddingBottom: '10px', color: '#424242' }}>
@@ -54,7 +58,7 @@ export default function Detalle({ usuario, handleLogout }) {
                     <p>{new Date(cotizacion.fecha).toLocaleDateString()}</p>
                 </div>
                 <div>
-                    <strong>Total Estimado:</strong>
+                    <strong>Total Final:</strong>
                     <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#F2A007' }}>
                         ${Number(cotizacion.total).toFixed(2)}
                     </p>
@@ -66,13 +70,21 @@ export default function Detalle({ usuario, handleLogout }) {
                     <p style={{ fontSize: '12px', color: '#666', fontStyle: 'italic' }}>{cotizacion.tipo_descripcion}</p>
                 </div>
 
+                {/* TAREA 3: Desglose completo incluyendo Costo Unitario */}
                 <div>
                     <strong>Metros Cuadrados:</strong>
                     <p>{cotizacion.metros} m²</p>
                 </div>
                 <div>
+                    <strong>Costo Unitario (m²):</strong>
+                    <p>${costoUnitario.toFixed(2)}</p>
+                </div>
+                <div>
                     <strong>Factor Interciudad:</strong>
                     <p>x {cotizacion.factor}</p>
+                </div>
+                <div>
+                     {/* Espacio vacío para alineación */}
                 </div>
             </div>
         </div>
@@ -82,7 +94,7 @@ export default function Detalle({ usuario, handleLogout }) {
                 <button style={{ backgroundColor: '#666' }}>Volver al Historial</button>
             </Link>
              {/* FUTURO FEATURE HU2 */}
-            <button style={{ marginLeft: '10px' }}>Descargar PDF</button>
+            <button disabled style={{ marginLeft: '10px', opacity: 0.5 }}>Descargar PDF</button>
         </div>
 
       </div>
