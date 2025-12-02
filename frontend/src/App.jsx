@@ -3,6 +3,7 @@ import Login from './components/login';
 import Register from './components/register';
 import Cotizacion from './components/cotizacion';
 import Historial from './components/historial';
+import Detalle from './components/detalle';
 import './assets/App.css';
 import { useState, useEffect } from 'react';
 
@@ -67,6 +68,16 @@ export default function Main() {
           element={!usuario ? <Login onLogin={setUsuario} /> : <Navigate to="/" />} 
         />
         <Route path="/register" element={<Register />} />
+        {/* Ruta para el Detalle (HU4)*/}
+        <Route 
+          path="/detalle/:id" 
+          element={
+            usuario ? (
+              <Detalle usuario={usuario} handleLogout={handleLogout} />
+            ) : (
+              <Navigate to="/login" />
+            )
+        } />
       </Routes>
     </Router>
   );
