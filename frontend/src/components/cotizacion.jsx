@@ -15,7 +15,7 @@ export default function Cotizacion({ usuario, handleLogout }) {
   const [metros, setMetros] = useState("");
   const [factorSeleccionado, setFactorSeleccionado] = useState(1);
   const [costoTotal, setCostoTotal] = useState(0);
-  
+  const [totalFormateado, setTotalFormateado] = useState("");
   // Estado para el nombre de la cotización (HU3)
   const [nombreCotizacion, setNombreCotizacion] = useState("");
 
@@ -33,12 +33,18 @@ export default function Cotizacion({ usuario, handleLogout }) {
       .then((data) => setFactores(data));
   }, []);
 
+  // Actualizar costo total
+  useEffect(() => {
+    setTotalFormateado(costoTotal.toLocaleString('en-US')); 
+  } , [costoTotal]);
+
   const calcularCosto = () => {
     if (tipoSeleccionado !== null && metros > 0) {
       const costoM2 = costos.find((c) => c.id_tipo === tipoSeleccionado)?.costo || 0;
       setCostoTotal(costoM2 * metros * factorSeleccionado);
     }
   };
+
 
   // --- NUEVA FUNCIÓN: GUARDAR COTIZACIÓN (HU3 - Tarea 4) ---
   const guardarCotizacion = async () => {
@@ -140,8 +146,8 @@ export default function Cotizacion({ usuario, handleLogout }) {
           <img src="assets/LOGO-PNG-COMPLETO-METALIZADO.png" alt="Logo" />
         </div>
         <div className="menu">
-          <Link to="/">Cotización básica</Link>
-          <Link to="/historial" style={{fontWeight: 'bold', textDecoration: 'underline'}}>Cotizaciones Anteriores</Link>
+          <Link to="/" style={{fontWeight: 'bold', textDecoration: 'underline'}}>Cotización básica</Link>
+          <Link to="/historial" style={{fontWeight: 'bold'}}>Cotizaciones Anteriores</Link>
         </div>
         <div className="user" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span style={{ fontWeight: 'bold', color: 'white' }}>{usuario ? usuario.nombre : "Invitado"}</span>
@@ -195,7 +201,7 @@ export default function Cotizacion({ usuario, handleLogout }) {
           <button onClick={calcularCosto}>Calcular</button>
         </div>
 
-        <h3>Costo total estimado: ${costoTotal.toFixed(2)}</h3>
+        <h3>Costo total estimado: ${totalFormateado}</h3>
 
         {/* --- SECCIÓN NUEVA: GUARDAR COTIZACIÓN (HU3 - Tarea 4) --- */}
         <div className="buttons-section" style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px'}}>

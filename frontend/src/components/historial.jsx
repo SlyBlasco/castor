@@ -110,7 +110,7 @@ export default function Historial({ usuario, handleLogout }) {
                                 <td style={{ padding: '10px', fontWeight: 'bold' }}>{c.nombre_proyecto}</td>
                                 <td style={{ padding: '10px' }}>{c.tipo_construccion}</td>
                                 <td style={{ padding: '10px', color: '#F2A007', fontWeight: 'bold' }}>
-                                    ${Number(c.total).toFixed(2)}
+                                    ${Number(c.total).toLocaleString('en-US')}
                                 </td>
                             </tr>
                         ))
