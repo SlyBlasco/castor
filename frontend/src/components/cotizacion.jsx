@@ -91,54 +91,6 @@ export default function Cotizacion({ usuario, handleLogout }) {
     }
   };
 
-  const generarReporte = () => {
-    if (!tipoSeleccionado || metros <= 0) {
-      alert("Por favor, complete todos los datos antes de generar el reporte.");
-      return;
-    }
-    const tipo = costos.find((c) => c.id_tipo === tipoSeleccionado);
-    const descripcion = tipo ? tipo.descripcion : "No disponible";
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
-    doc.setTextColor(242, 160, 7);
-    const titulo = `Reporte de Cotización - ${usuarioNombre}`;
-    doc.text(titulo, pageWidth / 2, 20, { align: "center" });
-
-    doc.setDrawColor(242, 160, 7);
-    doc.setLineWidth(0.5);
-    doc.line(10, 25, pageWidth - 10, 25);
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(12);
-    doc.setTextColor(51, 51, 51);
-
-    let y = 35;
-    doc.text(`Tipo de Construcción: ${tipo.id_tipo}`, 10, y);
-    y += 10;
-
-    const maxLineWidth = pageWidth - 20;
-    const descripcionTexto = `Descripción: ${descripcion}`;
-    const descripcionEnvoltorio = doc.splitTextToSize(descripcionTexto, maxLineWidth);
-    doc.text(descripcionEnvoltorio, 10, y);
-    y += descripcionEnvoltorio.length * 7;
-    y += 5;
-
-    doc.text(`Área Total: ${metros} m²`, 10, y);
-    y += 10;
-    doc.text(`Factor Interciudad: ${factorSeleccionado}`, 10, y);
-    y += 10;
-    doc.text(`Costo Total Estimado: $${costoTotal.toFixed(2)}`, 10, y);
-    y += 10;
-
-    doc.setDrawColor(224, 224, 224);
-    doc.line(10, y, pageWidth - 10, y);
-
-    doc.save(`reporte_cotizacion_${usuarioNombre}.pdf`);
-  };
-
   return (
     <>
       <div className="navbar">
@@ -216,11 +168,6 @@ export default function Cotizacion({ usuario, handleLogout }) {
                 <button onClick={guardarCotizacion} style={{backgroundColor: '#4CAF50'}}>
                     Guardar Cotización
                 </button>
-            </div>
-
-            <div className="buttons" style={{marginTop: '10px'}}>
-                <button disabled>Compartir</button>
-                <button onClick={generarReporte}>Generar Reporte PDF</button>
             </div>
         </div>
       </div>

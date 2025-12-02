@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import "../assets/Cotizacion.css"; 
+import "../assets/Cotizacion.css";
 
 /* TAREA 2 */
 export default function Detalle({ usuario, handleLogout }) {
@@ -18,7 +18,7 @@ export default function Detalle({ usuario, handleLogout }) {
       .catch(err => setError(err.message));
   }, [id]);
 
-  if (error) return <div className="container"><p style={{color: 'red'}}>{error}</p><Link to="/historial">Volver</Link></div>;
+  if (error) return <div className="container"><p style={{ color: 'red' }}>{error}</p><Link to="/historial">Volver</Link></div>;
   if (!cotizacion) return <div className="container"><p>Cargando...</p></div>;
 
   // TAREA 3: Calcular el Costo Unitario Original
@@ -36,65 +36,73 @@ export default function Detalle({ usuario, handleLogout }) {
           <Link to="/historial">Cotizaciones Anteriores</Link>
         </div>
         <div className="user" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-             <span style={{ fontWeight: 'bold', color: 'white' }}>{usuario ? usuario.nombre : "Invitado"}</span>
-             <button onClick={handleLogout} style={{ fontSize: '10px', padding: '2px 5px', cursor: 'pointer' }}>Salir</button>
-             <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="User" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+          <span style={{ fontWeight: 'bold', color: 'white' }}>{usuario ? usuario.nombre : "Invitado"}</span>
+          <button onClick={handleLogout} style={{ fontSize: '10px', padding: '2px 5px', cursor: 'pointer' }}>Salir</button>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="User" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
         </div>
       </div>
 
       <div className="container">
         <h1>Detalle de Cotización</h1>
-        
+
         {/* Tarjeta de Detalle (Read-only) - TAREA 4 CUMPLIDA (No editable) */}
         <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '20px', maxWidth: '600px', margin: '0 auto', textAlign: 'left', backgroundColor: '#f9f9f9' }}>
-            
-            <h2 style={{ borderBottom: '2px solid #F2A007', paddingBottom: '10px', color: '#424242' }}>
-                {cotizacion.nombre_proyecto}
-            </h2>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '20px' }}>
-                <div>
-                    <strong>Fecha:</strong>
-                    <p>{new Date(cotizacion.fecha).toLocaleDateString()}</p>
-                </div>
-                <div>
-                    <strong>Total Final:</strong>
-                    <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#F2A007' }}>
-                        ${Number(cotizacion.total).toFixed(2)}
-                    </p>
-                </div>
-                
-                <div style={{ gridColumn: '1 / -1' }}>
-                    <strong>Tipo de Construcción:</strong>
-                    <p>{cotizacion.tipo_nombre}</p>
-                    <p style={{ fontSize: '12px', color: '#666', fontStyle: 'italic' }}>{cotizacion.tipo_descripcion}</p>
-                </div>
+          <h2 style={{ borderBottom: '2px solid #F2A007', paddingBottom: '10px', color: '#424242' }}>
+            {cotizacion.nombre_proyecto}
+          </h2>
 
-                {/* TAREA 3: Desglose completo incluyendo Costo Unitario */}
-                <div>
-                    <strong>Metros Cuadrados:</strong>
-                    <p>{cotizacion.metros} m²</p>
-                </div>
-                <div>
-                    <strong>Costo Unitario (m²):</strong>
-                    <p>${costoUnitario.toFixed(2)}</p>
-                </div>
-                <div>
-                    <strong>Factor Interciudad:</strong>
-                    <p>x {cotizacion.factor}</p>
-                </div>
-                <div>
-                     {/* Espacio vacío para alineación */}
-                </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '20px' }}>
+            <div>
+              <strong>Fecha:</strong>
+              <p>{new Date(cotizacion.fecha).toLocaleDateString()}</p>
             </div>
+            <div>
+              <strong>Total Final:</strong>
+              <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#F2A007' }}>
+                ${Number(cotizacion.total).toFixed(2)}
+              </p>
+            </div>
+
+            <div style={{ gridColumn: '1 / -1' }}>
+              <strong>Tipo de Construcción:</strong>
+              <p>{cotizacion.tipo_nombre}</p>
+              <p style={{ fontSize: '12px', color: '#666', fontStyle: 'italic' }}>{cotizacion.tipo_descripcion}</p>
+            </div>
+
+            {/* TAREA 3: Desglose completo incluyendo Costo Unitario */}
+            <div>
+              <strong>Metros Cuadrados:</strong>
+              <p>{cotizacion.metros} m²</p>
+            </div>
+            <div>
+              <strong>Costo Unitario (m²):</strong>
+              <p>${costoUnitario.toFixed(2)}</p>
+            </div>
+            <div>
+              <strong>Factor Interciudad:</strong>
+              <p>x {cotizacion.factor}</p>
+            </div>
+            <div>
+              {/* Espacio vacío para alineación */}
+            </div>
+          </div>
         </div>
 
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <Link to="/historial">
-                <button style={{ backgroundColor: '#666' }}>Volver al Historial</button>
-            </Link>
-             {/* FUTURO FEATURE HU2 */}
-            <button disabled style={{ marginLeft: '10px', opacity: 0.5 }}>Descargar PDF</button>
+          <Link to="/historial">
+            <button style={{ backgroundColor: '#666' }}>Volver al Historial</button>
+          </Link>
+          {/* HU2 TAREA 3: Integrar botón de descarga en el frontend */}
+          <button
+            onClick={() => {
+              // Abrimos el endpoint del backend en una nueva pestaña para forzar la descarga
+              window.open(`${import.meta.env.VITE_API_URL}/api/cotizacion/${id}/pdf`, '_blank');
+            }}
+            style={{ marginLeft: '10px', backgroundColor: '#F2A007', color: 'white', cursor: 'pointer' }}
+          >
+            Descargar PDF Oficial
+          </button>
         </div>
 
       </div>

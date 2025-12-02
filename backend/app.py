@@ -1,7 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import mysql.connector
 import bcrypt
+import io
+from fpdf import FPDF
 from config import DB_HOST, DB_USER, DB_PASS, DB_NAME
 
 app = Flask(__name__)
@@ -246,6 +248,103 @@ def obtener_detalle_cotizacion(id_cotizacion):
     finally:
         cursor.close()
         conn.close()
+
+# -------------------------------------------------------------------------
+# HU2: DESCARGAR COTIZACIÓN EN PDF
+# Tarea 1: Crear endpoint para generar PDF
+# Tarea 2: Diseñar plantilla visual del PDF
+# -------------------------------------------------------------------------
+@app.route('/api/cotizacion/<int:id_cotizacion>/pdf', methods=['GET'])
+def descargar_pdf(id_cotizacion):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    # 1. Recuperar datos
+    query = """
+        SELECT c.*, tc.nombre AS tipo_nombre, tc.descripcion AS tipo_descripcion, u.nombre AS usuario_nombre
+        FROM cotizaciones c
+        JOIN tiposconstruccion tc ON c.tipo = tc.id_tipo
+        JOIN usuarios u ON c.id_usuario = u.id_usuario
+        WHERE c.id_cotizacion = %s
+    """
+    cursor.execute(query, (id_cotizacion,))
+    datos = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if not datos:
+        return jsonify({'error': 'Cotización no encontrada'}), 404
+
+    # --- TAREA 2: DISEÑAR PLANTILLA VISUAL ---
+    pdf = FPDF()
+    pdf.add_page()
+    
+    # Agregar LOGO
+    try:
+        pdf.image('LOGO-PNG-COMPLETO-METALIZADO.png', x=75, y=8, w=50)
+    except Exception as e:
+        print(f"Advertencia: No se pudo cargar el logo. Error: {e}")
+    pdf.set_y(40)
+
+    # Encabezado
+    pdf.set_font("Arial", 'B', 20)
+    pdf.set_text_color(242, 160, 7) # Color Naranja Corporativo
+    pdf.cell(0, 10, "RIVA CONSTRUCCIONES", ln=True, align='C')
+    
+    # Línea divisoria
+    pdf.set_draw_color(242, 160, 7)
+    pdf.set_line_width(1)
+    pdf.line(10, 25, 200, 25)
+    
+    # Título del Reporte
+    pdf.ln(20)
+    pdf.set_font("Arial", 'B', 16)
+    pdf.set_text_color(50, 50, 50)
+    pdf.cell(0, 10, f"Reporte de Cotización: {datos['nombre']}", ln=True)
+    
+    # Detalles del Cliente
+    pdf.set_font("Arial", '', 12)
+    pdf.cell(0, 10, f"Cliente: {datos['usuario_nombre']}", ln=True)
+    pdf.cell(0, 10, f"Fecha: {datos['fecha']}", ln=True)
+    
+    # Tabla de Datos (Diseño limpio)
+    pdf.ln(10)
+    pdf.set_fill_color(240, 240, 240) # Fondo gris claro
+    pdf.set_font("Arial", 'B', 12)
+    
+    pdf.cell(95, 10, "Concepto", 1, 0, 'C', fill=True)
+    pdf.cell(95, 10, "Detalle", 1, 1, 'C', fill=True)
+    
+    pdf.set_font("Arial", '', 12)
+    
+    # Función auxiliar para filas
+    def fila(titulo, valor):
+        pdf.cell(95, 10, titulo, 1)
+        pdf.cell(95, 10, str(valor), 1, 1)
+
+    fila("Tipo de Construcción", datos['tipo_nombre'])
+    fila("Metros Cuadrados", f"{datos['metros']} m2")
+    fila("Factor Interciudad", datos['factor'])
+    
+    # Total Resaltado
+    pdf.set_font("Arial", 'B', 14)
+    pdf.set_text_color(242, 160, 7)
+    pdf.cell(95, 12, "COSTO TOTAL", 1)
+    pdf.cell(95, 12, f"${datos['total']:.2f}", 1, 1)
+    
+    # Pie de página
+    pdf.set_y(-30)
+    pdf.set_font("Arial", 'I', 8)
+    pdf.set_text_color(128)
+    pdf.cell(0, 10, "Este documento es una estimación oficial de Riva Construcciones.", 0, 0, 'C')
+
+    # Retornar el archivo PDF
+    return send_file(
+        io.BytesIO(bytes(pdf.output(dest='S').encode('latin-1'))),
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name=f"cotizacion_{id_cotizacion}_{datos['usuario_nombre']}.pdf"
+    )
 
 if __name__ == '__main__':
     app.run(debug=False)
